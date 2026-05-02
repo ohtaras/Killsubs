@@ -1,1 +1,624 @@
+<!DOCTYPE html>
 
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>SubscriptionKiller</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+width: 100%;
+max-width: 100%;
+overflow-x: hidden;
+}
+
+body {
+font-family: ‘Inter’, sans-serif;
+background: #f5f0e8;
+color: #0d0d0d;
+min-height: 100vh;
+}
+
+/* ─── HERO ─────────────────────── */
+.hero {
+background: #0d0d0d;
+color: #fff;
+padding: 40px 20px 32px;
+text-align: center;
+width: 100%;
+}
+
+.hero-pill {
+display: inline-block;
+background: #f5c518;
+color: #0d0d0d;
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+padding: 5px 14px;
+border-radius: 99px;
+margin-bottom: 18px;
+}
+
+.hero h1 {
+font-family: ‘Syne’, sans-serif;
+font-size: clamp(40px, 10vw, 80px);
+font-weight: 800;
+line-height: 0.95;
+letter-spacing: -0.02em;
+word-break: break-word;
+}
+
+.hero h1 .red { color: #e8321e; }
+
+.hero-sub {
+margin-top: 12px;
+font-size: 14px;
+color: rgba(255,255,255,0.5);
+font-weight: 500;
+}
+
+/* ─── CALC ─────────────────────── */
+.calc {
+background: #fff;
+border-bottom: 2px solid #e0d8cc;
+padding: 22px 16px;
+width: 100%;
+}
+
+.calc-title {
+font-family: ‘Syne’, sans-serif;
+font-size: 16px;
+font-weight: 800;
+margin-bottom: 14px;
+}
+
+.calc-grid {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+margin-bottom: 12px;
+}
+
+.cinput {
+background: #f5f0e8;
+border: 1.5px solid #d0c8bc;
+border-radius: 10px;
+padding: 10px 12px;
+}
+.cinput:focus-within { border-color: #0d0d0d; }
+
+.cinput label {
+display: block;
+font-size: 9px;
+font-weight: 700;
+letter-spacing: 0.1em;
+text-transform: uppercase;
+color: #999;
+margin-bottom: 4px;
+}
+
+.cinput input {
+width: 100%;
+border: none;
+background: transparent;
+font-family: ‘Syne’, sans-serif;
+font-size: 20px;
+font-weight: 700;
+color: #0d0d0d;
+outline: none;
+-webkit-appearance: none;
+appearance: none;
+}
+.cinput input::placeholder { color: #ccc; }
+
+.calc-res {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: 8px;
+}
+
+.rbox {
+background: #f5f0e8;
+border: 1.5px solid #d0c8bc;
+border-radius: 10px;
+padding: 12px 8px;
+text-align: center;
+min-width: 0;
+}
+.rbox.hi {
+background: #0d0d0d;
+border-color: #0d0d0d;
+}
+
+.rval {
+font-family: ‘Syne’, sans-serif;
+font-size: 20px;
+font-weight: 800;
+color: #e8321e;
+display: block;
+line-height: 1;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+.rbox.hi .rval { color: #f5c518; }
+
+.rlbl {
+font-size: 8px;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: #aaa;
+margin-top: 4px;
+}
+.rbox.hi .rlbl { color: rgba(255,255,255,0.35); }
+
+/* ─── TOOLBAR ──────────────────── */
+.toolbar {
+position: sticky;
+top: 0;
+z-index: 50;
+background: #f5f0e8;
+border-bottom: 2px solid #d8d0c4;
+padding: 12px 16px 10px;
+width: 100%;
+}
+
+.sbox {
+display: flex;
+align-items: center;
+gap: 8px;
+background: #fff;
+border: 2px solid #0d0d0d;
+border-radius: 99px;
+padding: 10px 16px;
+margin-bottom: 10px;
+box-shadow: 3px 3px 0 #0d0d0d;
+width: 100%;
+}
+
+.sbox input {
+flex: 1;
+border: none;
+outline: none;
+font-family: ‘Inter’, sans-serif;
+font-size: 14px;
+font-weight: 600;
+background: transparent;
+color: #0d0d0d;
+min-width: 0;
+}
+.sbox input::placeholder { color: #bbb; }
+
+.filters {
+display: flex;
+gap: 6px;
+flex-wrap: wrap;
+}
+
+.fp {
+font-family: ‘Inter’, sans-serif;
+font-size: 12px;
+font-weight: 700;
+padding: 6px 13px;
+border-radius: 99px;
+border: 1.5px solid #c8c0b4;
+background: #fff;
+color: #666;
+cursor: pointer;
+white-space: nowrap;
+-webkit-tap-highlight-color: transparent;
+}
+.fp.on { background: #0d0d0d; border-color: #0d0d0d; color: #fff; }
+.fp.nm.on { background: #e8321e; border-color: #e8321e; }
+
+.tmeta {
+text-align: right;
+margin-top: 8px;
+font-size: 12px;
+font-weight: 600;
+color: #999;
+}
+.tmeta strong { color: #0d0d0d; }
+
+/* ─── CONTENT ──────────────────── */
+.content {
+padding: 12px 14px 24px;
+width: 100%;
+}
+
+.cat-hdr {
+font-family: ‘Syne’, sans-serif;
+font-size: 11px;
+font-weight: 800;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: #aaa;
+padding: 18px 0 8px;
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.cat-hdr::after {
+content: ‘’;
+flex: 1;
+height: 1.5px;
+background: #d8d0c4;
+}
+
+.grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 10px;
+width: 100%;
+}
+
+/* ─── CARD ─────────────────────── */
+.card {
+background: #fff;
+border: 2px solid #0d0d0d;
+border-radius: 14px;
+padding: 14px 12px 12px;
+display: flex;
+flex-direction: column;
+gap: 5px;
+box-shadow: 3px 3px 0 #0d0d0d;
+position: relative;
+overflow: hidden;
+min-width: 0;
+}
+
+.stripe {
+position: absolute;
+top: 0; left: 0; right: 0;
+height: 3px;
+}
+
+.clogo { font-size: 24px; line-height: 1; margin-top: 2px; }
+
+.cname {
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+font-weight: 800;
+color: #0d0d0d;
+line-height: 1.2;
+word-break: break-word;
+}
+
+.cprice {
+font-family: ‘Syne’, sans-serif;
+font-size: 18px;
+font-weight: 800;
+color: #e8321e;
+line-height: 1;
+}
+
+.cnote {
+font-size: 8px;
+font-weight: 600;
+letter-spacing: 0.07em;
+text-transform: uppercase;
+color: #bbb;
+}
+
+.dbadge {
+display: inline-block;
+font-size: 9px;
+font-weight: 800;
+letter-spacing: 0.05em;
+text-transform: uppercase;
+padding: 3px 8px;
+border-radius: 99px;
+width: fit-content;
+}
+.de { background: rgba(29,185,84,0.12);  color: #1a9e48; }
+.dm { background: rgba(200,160,0,0.12);  color: #9e7a00; }
+.dh { background: rgba(220,100,0,0.12);  color: #c05800; }
+.dn { background: rgba(232,50,30,0.1);   color: #e8321e; }
+
+.tip-btn {
+font-size: 11px;
+font-weight: 600;
+color: #999;
+cursor: pointer;
+background: none;
+border: none;
+font-family: ‘Inter’, sans-serif;
+padding: 2px 0;
+text-align: left;
+-webkit-tap-highlight-color: transparent;
+}
+
+.tip-txt {
+display: none;
+font-size: 11px;
+font-weight: 500;
+color: #555;
+line-height: 1.5;
+background: #f5f0e8;
+border-radius: 8px;
+padding: 8px 10px;
+border-left: 2px solid #f5c518;
+}
+.tip-txt.open { display: block; }
+
+.kill {
+display: block;
+width: 100%;
+padding: 10px 8px;
+margin-top: 4px;
+background: #e8321e;
+color: #fff;
+text-align: center;
+text-decoration: none;
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+font-weight: 800;
+letter-spacing: 0.04em;
+border-radius: 8px;
+border: 1.5px solid #0d0d0d;
+box-shadow: 2px 2px 0 #0d0d0d;
+-webkit-tap-highlight-color: transparent;
+}
+.kill.done { background: #1db954; }
+
+.empty {
+text-align: center;
+padding: 60px 20px;
+color: #aaa;
+font-size: 14px;
+font-weight: 600;
+}
+
+footer {
+text-align: center;
+padding: 24px 16px;
+font-size: 11px;
+font-weight: 600;
+color: #aaa;
+border-top: 2px solid #d8d0c4;
+}
+</style>
+
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-pill">Free · No sign-up</div>
+  <h1>SUBSCRIPTION<br><span class="red">KILLER</span></h1>
+  <p class="hero-sub">Direct cancel links. No chatbots. No BS.</p>
+</div>
+
+<div class="calc">
+  <div class="calc-title">How much are you losing? 💸</div>
+  <div class="calc-grid">
+    <div class="cinput">
+      <label>Streaming</label>
+      <input type="number" inputmode="decimal" id="c1" placeholder="0" oninput="doCalc()">
+    </div>
+    <div class="cinput">
+      <label>Music</label>
+      <input type="number" inputmode="decimal" id="c2" placeholder="0" oninput="doCalc()">
+    </div>
+    <div class="cinput">
+      <label>Work Tools</label>
+      <input type="number" inputmode="decimal" id="c3" placeholder="0" oninput="doCalc()">
+    </div>
+    <div class="cinput">
+      <label>Gaming &amp; Other</label>
+      <input type="number" inputmode="decimal" id="c4" placeholder="0" oninput="doCalc()">
+    </div>
+  </div>
+  <div class="calc-res">
+    <div class="rbox">
+      <span class="rval" id="rmo">&#8364;0</span>
+      <div class="rlbl">/ month</div>
+    </div>
+    <div class="rbox">
+      <span class="rval" id="ryr">&#8364;0</span>
+      <div class="rlbl">/ year</div>
+    </div>
+    <div class="rbox hi">
+      <span class="rval" id="rcf">0 &#9749;</span>
+      <div class="rlbl">coffees</div>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="sbox">
+    <span>🔍</span>
+    <input type="text" id="q" placeholder="Search Netflix, Adobe..." oninput="doRender()">
+  </div>
+  <div class="filters">
+    <button class="fp on"  onclick="setF('all',this)">All</button>
+    <button class="fp"     onclick="setF('streaming',this)">Streaming</button>
+    <button class="fp"     onclick="setF('music',this)">Music</button>
+    <button class="fp"     onclick="setF('work',this)">Work</button>
+    <button class="fp"     onclick="setF('gaming',this)">Gaming</button>
+    <button class="fp"     onclick="setF('social',this)">Social</button>
+    <button class="fp"     onclick="setF('health',this)">Health</button>
+    <button class="fp"     onclick="setF('news',this)">News</button>
+    <button class="fp"     onclick="setF('other',this)">Other</button>
+    <button class="fp nm"  onclick="setF('nightmare',this)">😱 Nightmares</button>
+  </div>
+  <div class="tmeta">Showing <strong id="cnt">0</strong> services</div>
+</div>
+
+<div class="content" id="content"></div>
+
+<footer>No tracking &middot; No ads &middot; Just cancel links</footer>
+
+<script>
+var S = [
+  {n:"Netflix",        e:"📺", c:"streaming", p:17.99, l:"€17.99", d:"e", tip:"Account > Membership > Cancel. Instant, no phone call needed.", u:"https://www.netflix.com/cancelplan"},
+  {n:"Disney+",        e:"🏰", c:"streaming", p:13.99, l:"€13.99", d:"e", tip:"Account > Subscription > Cancel. Clean and direct.", u:"https://www.disneyplus.com/account"},
+  {n:"Apple TV+",      e:"🍿", c:"streaming", p:9.99,  l:"€9.99",  d:"e", tip:"Settings > Apple ID > Subscriptions > Cancel.", u:"https://tv.apple.com/settings"},
+  {n:"Hulu",           e:"🎬", c:"streaming", p:17.99, l:"$17.99", d:"m", tip:"Account > Cancel. Will offer cheaper ad plan first. Decline.", u:"https://secure.hulu.com/account"},
+  {n:"HBO Max",        e:"🎥", c:"streaming", p:15.99, l:"$15.99", d:"m", tip:"Profile > Manage Subscription > Cancel. Expect a save-offer.", u:"https://www.max.com/account/subscription"},
+  {n:"Paramount+",     e:"⭐", c:"streaming", p:7.99,  l:"$7.99",  d:"e", tip:"Account > Manage Subscription > Cancel.", u:"https://www.paramountplus.com/account/"},
+  {n:"Peacock",        e:"🦚", c:"streaming", p:7.99,  l:"$7.99",  d:"e", tip:"Account > Plan > Cancel Plan. No guilt screens.", u:"https://www.peacocktv.com/account"},
+  {n:"Discovery+",     e:"🔬", c:"streaming", p:4.99,  l:"$4.99",  d:"e", tip:"Account > Subscription > Cancel. Quick and clean.", u:"https://www.discoveryplus.com/profile"},
+  {n:"Crunchyroll",    e:"🍜", c:"streaming", p:7.99,  l:"$7.99",  d:"m", tip:"My Account > Manage Subscription > Cancel.", u:"https://www.crunchyroll.com/account/subscription"},
+  {n:"Mubi",           e:"🎦", c:"streaming", p:10.99, l:"€10.99", d:"e", tip:"Account > Subscription > Cancel.", u:"https://mubi.com/account"},
+  {n:"Shudder",        e:"👻", c:"streaming", p:5.99,  l:"$5.99",  d:"e", tip:"My Account > My Subscription > Cancel.", u:"https://www.shudder.com/account"},
+
+  {n:"Spotify",        e:"🎵", c:"music", p:10.99, l:"€10.99", d:"e", tip:"Account > Subscription > Cancel. Takes effect at billing date.", u:"https://www.spotify.com/account/cancel"},
+  {n:"Apple Music",    e:"🎶", c:"music", p:10.99, l:"€10.99", d:"e", tip:"Settings > Apple ID > Subscriptions > Cancel.", u:"https://music.apple.com/account"},
+  {n:"YouTube Music",  e:"▶️", c:"music", p:10.99, l:"€10.99", d:"e", tip:"Google Account > Paid Memberships > Cancel.", u:"https://music.youtube.com/paid_memberships"},
+  {n:"Tidal",          e:"🌊", c:"music", p:10.99, l:"$10.99", d:"m", tip:"Account > Subscriptions > Cancel.", u:"https://account.tidal.com/settings/subscriptions"},
+  {n:"Deezer",         e:"🎙", c:"music", p:9.99,  l:"€9.99",  d:"e", tip:"Profile > Manage Subscription > Cancel.", u:"https://www.deezer.com/account"},
+  {n:"Audible",        e:"🎧", c:"music", p:14.95, l:"$14.95", d:"h", tip:"Account Details > Cancel Membership. Amazon shows lost credits to guilt you.", u:"https://www.audible.com/account/overview"},
+  {n:"SiriusXM",       e:"📡", c:"music", p:10.99, l:"$10.99", d:"n", tip:"Must CALL 1-866-635-2349. No online cancel exists.", u:"https://www.siriusxm.com/cancelsubscription"},
+
+  {n:"Adobe CC",       e:"🎨", c:"work", p:65.00, l:"€65",    d:"n", tip:"WARNING: 50% early-termination fee. Cancel on your billing anniversary.", u:"https://account.adobe.com/plans"},
+  {n:"Microsoft 365",  e:"💻", c:"work", p:9.99,  l:"€9.99",  d:"m", tip:"Microsoft Account > Services > Cancel.", u:"https://account.microsoft.com/services"},
+  {n:"Dropbox",        e:"📦", c:"work", p:11.99, l:"$11.99", d:"m", tip:"Account > Plans > Downgrade.", u:"https://www.dropbox.com/buy/cancel"},
+  {n:"Canva Pro",      e:"✏️", c:"work", p:14.99, l:"€14.99", d:"e", tip:"Settings > Billing > Cancel Pro. Confirm twice.", u:"https://www.canva.com/settings/billing-and-teams"},
+  {n:"Notion",         e:"📒", c:"work", p:10.00, l:"$10",    d:"e", tip:"Settings > Billing > Cancel plan. Notes stay on free tier.", u:"https://www.notion.so/profile/billing"},
+  {n:"Grammarly",      e:"📝", c:"work", p:12.00, l:"$12",    d:"m", tip:"Account > Subscription > Cancel. Expect a discount offer.", u:"https://account.grammarly.com/subscription"},
+  {n:"Figma",          e:"🎯", c:"work", p:15.00, l:"$15",    d:"e", tip:"Settings > Plans & Billing > Downgrade. Instant.", u:"https://www.figma.com/settings"},
+  {n:"Slack",          e:"💬", c:"work", p:7.25,  l:"$7.25",  d:"m", tip:"Billing > Change Plan > Downgrade to Free.", u:"https://slack.com/billing"},
+  {n:"Zoom",           e:"📹", c:"work", p:15.99, l:"$15.99", d:"m", tip:"Account Management > Billing > Cancel Subscription.", u:"https://zoom.us/account/billing"},
+  {n:"LastPass",       e:"🔑", c:"work", p:3.00,  l:"$3",     d:"e", tip:"Account Settings > Cancel Premium.", u:"https://lastpass.com/my-account"},
+  {n:"Evernote",       e:"🐘", c:"work", p:14.99, l:"$14.99", d:"m", tip:"Account Summary > Cancel Premium. Notes stay on free tier.", u:"https://www.evernote.com/Settings.action"},
+
+  {n:"PS Plus",        e:"🎮", c:"gaming", p:8.99,  l:"€8.99",  d:"h", tip:"PSN Account > Subscription Management > Cancel.", u:"https://id.playstation.com/account/management"},
+  {n:"Xbox Game Pass", e:"🕹", c:"gaming", p:14.99, l:"€14.99", d:"m", tip:"Microsoft Account > Services > Cancel Game Pass.", u:"https://account.microsoft.com/services"},
+  {n:"EA Play",        e:"⚽", c:"gaming", p:4.99,  l:"€4.99",  d:"e", tip:"EA Account > Subscriptions > Cancel. Fast.", u:"https://www.ea.com/account/cancel-subscription"},
+  {n:"Nintendo Online",e:"🍄", c:"gaming", p:3.99,  l:"€3.99",  d:"e", tip:"Nintendo eShop > Account > Cancel Auto-Renewal.", u:"https://accounts.nintendo.com/profile/subscriptions"},
+  {n:"Twitch Turbo",   e:"🟣", c:"gaming", p:8.99,  l:"$8.99",  d:"e", tip:"Settings > Subscriptions > Cancel Turbo. Painless.", u:"https://www.twitch.tv/settings/subscriptions"},
+
+  {n:"LinkedIn Premium",e:"💼",c:"social", p:39.99, l:"$39.99", d:"h", tip:"Premium Hub > Cancel. They show ROI stats to guilt you. Ignore them.", u:"https://www.linkedin.com/premium/cancel"},
+  {n:"Tinder Gold",    e:"🔥", c:"social", p:29.99, l:"$29.99", d:"m", tip:"Profile > Settings > Manage Subscription via App Store.", u:"https://tinder.com/settings"},
+  {n:"Bumble Premium", e:"🐝", c:"social", p:24.99, l:"$24.99", d:"m", tip:"Profile > Manage Subscription via your app store.", u:"https://bumble.com/settings"},
+  {n:"X Premium",      e:"✖", c:"social", p:8.00,  l:"$8",     d:"e", tip:"Settings > Manage Subscription > Cancel.", u:"https://twitter.com/settings/manage_subscriptions"},
+  {n:"Hinge+",         e:"❤️", c:"social", p:29.99, l:"$29.99", d:"e", tip:"Profile > Account > Manage Subscription via app store.", u:"https://hinge.co/settings"},
+
+  {n:"Calm",           e:"🧘", c:"health", p:14.99, l:"$14.99", d:"m", tip:"Account > Subscription > Cancel. Will offer 40% discount.", u:"https://www.calm.com/settings"},
+  {n:"Headspace",      e:"🧠", c:"health", p:12.99, l:"$12.99", d:"m", tip:"Account > Subscription > Cancel. Offers pause option first.", u:"https://www.headspace.com/settings"},
+  {n:"MyFitnessPal",   e:"🏋", c:"health", p:9.99,  l:"$9.99",  d:"e", tip:"Account > My Account > Cancel Premium. Quick.", u:"https://www.myfitnesspal.com/account/profile"},
+  {n:"Noom",           e:"🥗", c:"health", p:59.99, l:"$59.99", d:"n", tip:"Cancel BEFORE trial ends — full charge on day 1 after. Email support@noom.com.", u:"https://www.noom.com/account"},
+  {n:"Peloton",        e:"🚴", c:"health", p:24.00, l:"$24",    d:"h", tip:"Membership > Cancel Membership. Buried deep in the app.", u:"https://members.onepeloton.com/profile/membership"},
+
+  {n:"New York Times", e:"📰", c:"news", p:17.00, l:"$17",    d:"n", tip:"NO cancel button. Must call 1-800-698-4637 or use live chat.", u:"https://www.nytimes.com/subscription/management"},
+  {n:"Washington Post",e:"🗞", c:"news", p:10.00, l:"$10",    d:"h", tip:"Account > Manage Subscription > Cancel. Multiple confirmation screens.", u:"https://account.washingtonpost.com"},
+  {n:"The Guardian",   e:"🌿", c:"news", p:5.00,  l:"£5",     d:"e", tip:"My Account > Manage Subscription > Cancel. Most ethical cancel here.", u:"https://profile.theguardian.com/account"},
+  {n:"Readwise",       e:"📖", c:"news", p:7.99,  l:"$7.99",  d:"e", tip:"Settings > Billing > Cancel. Quick and transparent.", u:"https://readwise.io/settings"},
+
+  {n:"Amazon Prime",   e:"📦", c:"other", p:8.99,  l:"€8.99",  d:"n", tip:"Prime > Manage Membership > End Membership. 5 guilt-trip screens. Stay focused.", u:"https://www.amazon.com/mc/pip/cancel"},
+  {n:"iCloud+",        e:"☁️", c:"other", p:2.99,  l:"€2.99",  d:"e", tip:"Settings > Apple ID > iCloud > Manage Storage > Downgrade.", u:"https://www.apple.com/icloud/"},
+  {n:"Google One",     e:"🔵", c:"other", p:2.99,  l:"€2.99",  d:"e", tip:"Google One app > Settings > Cancel membership.", u:"https://one.google.com"},
+  {n:"NordVPN",        e:"🔒", c:"other", p:3.99,  l:"€3.99",  d:"m", tip:"Dashboard > My Account > Cancel Auto-Renewal.", u:"https://my.nordaccount.com"},
+  {n:"ExpressVPN",     e:"🛡", c:"other", p:8.32,  l:"$8.32",  d:"m", tip:"My Account > Manage Subscription > Cancel. Email confirmation needed.", u:"https://www.expressvpn.com/setup"},
+  {n:"Duolingo Plus",  e:"🦉", c:"other", p:6.99,  l:"€6.99",  d:"e", tip:"Profile > Settings > Cancel. No dark patterns here.", u:"https://www.duolingo.com/settings/plus"}
+];
+
+var CN = {streaming:"Streaming",music:"Music",work:"Work & Tools",gaming:"Gaming",social:"Social & Dating",health:"Health & Fitness",news:"News & Reading",other:"Other"};
+var CO = ["streaming","music","work","gaming","social","health","news","other"];
+var SC = {streaming:"#4361ee",music:"#7b2ff7",work:"#ff7b00",gaming:"#1db954",social:"#e91e8c",health:"#00b09b",news:"#607d8b",other:"#795548"};
+var DC = {e:"de",m:"dm",h:"dh",n:"dn"};
+var DL = {e:"Easy",m:"Medium",h:"Hard",n:"Nightmare"};
+
+var af = "all";
+
+function doCalc() {
+  function g(id) { var el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; }
+  var t = g("c1") + g("c2") + g("c3") + g("c4");
+  var y = t * 12;
+  document.getElementById("rmo").textContent = "\u20AC" + Math.round(t);
+  document.getElementById("ryr").textContent = "\u20AC" + Math.round(y);
+  document.getElementById("rcf").textContent = Math.floor(y / 3.5) + " \u2615";
+}
+
+function setF(f, btn) {
+  af = f;
+  var all = document.querySelectorAll(".fp");
+  for (var i = 0; i < all.length; i++) all[i].classList.remove("on");
+  btn.classList.add("on");
+  doRender();
+}
+
+function doRender() {
+  var q = (document.getElementById("q").value || "").toLowerCase().trim();
+  var list = [];
+  for (var i = 0; i < S.length; i++) {
+    var s = S[i];
+    var mq = !q || s.n.toLowerCase().indexOf(q) >= 0;
+    var mf = af === "all" ? true : af === "nightmare" ? s.d === "n" : s.c === af;
+    if (mq && mf) list.push(s);
+  }
+  list.sort(function(a, b) { return a.n < b.n ? -1 : a.n > b.n ? 1 : 0; });
+  document.getElementById("cnt").textContent = list.length;
+
+  var wrap = document.getElementById("content");
+  if (!list.length) {
+    wrap.innerHTML = '<div class="empty">Nothing found. Try a different search.</div>';
+    return;
+  }
+
+  var showG = (af === "all" || af === "nightmare");
+  var html = "";
+
+  if (showG) {
+    var grp = {};
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      if (!grp[s.c]) grp[s.c] = [];
+      grp[s.c].push(s);
+    }
+    for (var ci = 0; ci < CO.length; ci++) {
+      var cat = CO[ci];
+      if (!grp[cat]) continue;
+      html += '<div class="cat-hdr">' + CN[cat] + '</div><div class="grid">';
+      for (var j = 0; j < grp[cat].length; j++) html += card(grp[cat][j]);
+      html += '</div>';
+    }
+  } else {
+    html = '<div class="grid">';
+    for (var i = 0; i < list.length; i++) html += card(list[i]);
+    html += '</div>';
+  }
+
+  wrap.innerHTML = html;
+}
+
+function card(s) {
+  var col = SC[s.c] || "#999";
+  var dc  = DC[s.d] || "de";
+  var dl  = DL[s.d] || "";
+  var tid = "t" + s.n.replace(/\W/g, "");
+  return '<div class="card">'
+    + '<div class="stripe" style="background:' + col + '"></div>'
+    + '<div class="clogo">' + s.e + '</div>'
+    + '<div class="cname">' + s.n + '</div>'
+    + '<div class="cprice">' + s.l + '/mo</div>'
+    + '<div class="cnote">monthly</div>'
+    + '<div class="dbadge ' + dc + '">' + dl + '</div>'
+    + '<button class="tip-btn" onclick="tog(\'' + tid + '\')" type="button">💡 Cancel tip</button>'
+    + '<div class="tip-txt" id="' + tid + '">' + s.tip + '</div>'
+    + '<a href="' + s.u + '" target="_blank" rel="noopener" class="kill" onclick="kd(this)">Cancel Now</a>'
+    + '</div>';
+}
+
+function tog(id) {
+  var el = document.getElementById(id);
+  if (el) el.classList.toggle("open");
+}
+
+function kd(btn) {
+  btn.textContent = "Done! Check email";
+  btn.classList.add("done");
+  setTimeout(function() { btn.textContent = "Cancel Now"; btn.classList.remove("done"); }, 2500);
+}
+
+doRender();
+</script>
+
+</body>
+</html>
